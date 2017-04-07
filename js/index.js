@@ -47,10 +47,10 @@ function createMap(data,geom){
     var baselayer2 = L.tileLayer('https://data.hdx.rwlabs.org/mapbox-layer-tiles/{z}/{x}/{y}.png', {minZoom:4});
 
     map = L.map('map',{
-                center: [52,0],
-                zoom: 1,
-                layers: [baselayer,baselayer2]
-            });
+        center: [52,0],
+        zoom: 1,
+        layers: [baselayer,baselayer2]
+    });
 
     var style = function(feature) {
         var color = '#606161';
@@ -63,28 +63,28 @@ function createMap(data,geom){
         };
 
         return {
-                'color': color,
-                'fillcolor': color,
-                'weight': 0.4,
-                'opacity': 0.4,
-                'fillOpacity':fillOpacity,
-                'className':cls
-            };
+            'color': color,
+            'fillcolor': color,
+            'weight': 0.4,
+            'opacity': 0.4,
+            'fillOpacity':fillOpacity,
+            'className':cls
+        };
     }
 
     map.overlay = L.geoJson(geom,{
         style:style,
         onEachFeature: function (feature, layer) {
-                layer.on({
+            layer.on({
                 mouseover: fillInControl,
                 mouseout: emptyControl,
                 click: onClick
-                });
+            });
 
-                feature.properties.bounds_calculated=layer.getBounds();
-            }
+            feature.properties.bounds_calculated=layer.getBounds();
+        }
     }).addTo(map);
-////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
     function fillInControl(e) {
         var layer = e.target;
         control_info_country.update(layer.feature.properties);
@@ -113,16 +113,16 @@ function createMap(data,geom){
     };
 
     control_info_country.addTo(map);
-///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
 
 }
 
 function rss(data){
-  var string = '';
-  data.forEach(function(d){
-    string += '<a href="'+d['#meta+url']+'">'+ d['#meta+title'] + '</a> - ';
-  });
-  $('#feed').html(string);
+    var string = '';
+    data.forEach(function(d){
+        string += '<a href="'+d['#meta+url']+'">'+ d['#meta+title'] + '</a> - ';
+    });
+    $('#feed').html(string);
 }
 
 function createFieldReports(data){
@@ -198,6 +198,19 @@ function hxlProxyToJSON(input,headers){
     return output;
 }
 
+function insertionSort(array) {
+    var len = array.length;
+    for (i = 0; i < (len - 1) ; i++) {
+        for (j = i + 1; j < len; j++) {
+            if (array[i]['#date'] < array[j]['#date']) {
+                temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+    }
+}
+
 var appealsurl = 'https://proxy.hxlstandard.org/data.json?strip-headers=on&filter03=merge&clean-date-tags01=%23date&filter02=select&merge-keys03=%23meta%2Bid&filter04=replace-map&filter05=merge&merge-tags03=%23meta%2Bcoverage%2C%23meta%2Bfunding&select-query02-01=%23date%2Bend%3E999999&merge-keys05=%23country%2Bname&merge-tags05=%23country%2Bcode&filter01=clean&replace-map-url04=https%3A//docs.google.com/spreadsheets/d/1hTE0U3V8x18homc5KxfA7IIrv1Y9F1oulhJt0Z4z3zo/edit%3Fusp%3Dsharing&merge-url03=https%3A//docs.google.com/spreadsheets/d/1rVAE8b3uC_XIqU-eapUGLU7orIzYSUmvlPm9tI0bCbU/edit%23gid%3D0&merge-url05=https%3A//docs.google.com/spreadsheets/d/1GugpfyzridvfezFcDsl6dNlpZDqI8TQJw-Jx52obny8/edit%3Fusp%3Dsharing&url=https%3A//docs.google.com/spreadsheets/d/19pBx2NpbgcLFeWoJGdCqECT2kw9O9_WmcZ3O41Sj4hU/edit%23gid%3D0';
 var today = new Date();
 var dd = today.getDate();
@@ -260,7 +273,8 @@ $.when(fieldReportsCall).then(function(frdata){
     createFieldReports(data);
 });
 
-$.when(alertsCall).then(function (frdata) {
-    var data = hxlProxyToJSON(frdata);
-    createAlerts(data);
-});
+    $.when(alertsCall).then(function (frdata) {
+        var data = hxlProxyToJSON(frdata);
+        insertionSort(data);
+        createAlerts(data);
+    });
